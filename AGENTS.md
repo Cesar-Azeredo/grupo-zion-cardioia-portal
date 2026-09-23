@@ -1,0 +1,150 @@
+# AGENTS.md — Contexto operacional do CardioIA Portal (Ir Além 1)
+
+> **Este arquivo é a fonte única do contexto do projeto.** É lido diretamente pelo GitHub Copilot, Cursor, Codex e afins.
+> O `CLAUDE.md` da raiz contém apenas `@AGENTS.md`, que importa este arquivo para o Claude Code. Edite só este arquivo.
+
+---
+
+## 1. Contexto
+
+**CardioIA** é um projeto acadêmico de IA em cardiologia, em 7 fases, do curso de Inteligência Artificial da **FIAP**.
+Este repositório é o **Ir Além 1**, uma entrega extra da **Fase 2**: só a **interface** de um portal que simula a rotina de um centro de diagnóstico cardiológico. **Dados simulados, nenhum back-end real.**
+
+É um repositório **separado** do repositório principal do projeto (`github.com/Cesar-Azeredo/CardioAI`), que fica na pasta irmã `../CardioAI` e **não é tocado** por este trabalho.
+
+**Grupo Zion**
+
+| Integrante | RM |
+|---|---|
+| Cesar Martinho de Azeredo | RM568140 |
+| Carlos Alberto Florindo Costato | RM567005 |
+| Phellype Matheus Giacoia Flaibam Massarente | RM566826 |
+
+Tutor: **Andre Godoy**. Coordenadora: **Ana Cristina dos Santos**.
+
+Idioma dos entregáveis e da interface: **português do Brasil**.
+
+---
+
+## 2. Estado atual
+
+| Campo | Valor |
+|---|---|
+| **Etapa em andamento** | **Etapa 1 — fundação** (projeto criado, estrutura, documentação; **nenhuma funcionalidade implementada**) |
+| Etapas concluídas | — |
+| Próxima etapa | Etapa 2 — implementação (a definir pelo humano) |
+| Repositório remoto | **não criado** (aguarda autorização explícita) |
+| Vídeo | **não gravado** |
+
+> **Mantenha esta tabela atualizada.** É o primeiro lugar que qualquer agente olha.
+
+---
+
+## 3. Requisitos literais do enunciado
+
+- Autenticação simulada via **Context API**, com **JWT fake no localStorage**.
+- **Listagem de pacientes** com API fake (ex.: JSONPlaceholder) ou base simulada.
+- **Formulário de agendamento** de consultas com **useState** e **useReducer**.
+- **Dashboard** com contagem de pacientes e de consultas agendadas.
+- **Proteção de rotas com AuthContext**: dados só aparecem com usuário logado.
+- Estilização com **CSS Modules** ou Styled Components.
+
+**Entregáveis**
+
+- Repositório **público** chamado **`grupo-zion-cardioia-portal`**.
+- Pastas **`/contexts`, `/components`, `/services`, `/pages`**.
+- `README.md` com **instalação e execução**.
+- **Lista de integrantes com nome e RM.**
+- **Vídeo de até 4 min no YouTube (não listado)**, com link no README.
+
+### Critérios de avaliação
+
+- Autenticação funcional e proteção de rotas.
+- Consumo de API e controle de estado.
+- Uso correto de hooks (`useState`, `useEffect`, `useContext`).
+- Componentização e organização.
+- Estilização responsiva e usabilidade.
+
+---
+
+## 4. Decisões de arquitetura (já tomadas)
+
+1. **Pacientes:** consumo **real** do JSONPlaceholder (`/users`) em `src/services/`, com um **adaptador** que converte usuário em paciente. Campos clínicos simulados (ex.: próxima consulta, status) gerados de forma **determinística a partir do `id`**, sem aleatoriedade.
+2. **Consultas:** estado num **`AppointmentsContext` com `useReducer`** (ações de agendar e cancelar), porque o dashboard precisa contar consultas criadas no formulário. O formulário usa **`useState`** para os campos e dispara ações no reducer. Validação: campos obrigatórios e data não pode estar no passado.
+3. **Autenticação:** **`AuthContext`** com JWT fake (header.payload.assinatura em base64, com `exp`), gravado no `localStorage` e **validado na carga** (token expirado = deslogado). Credenciais de demonstração documentadas no README. README com aviso de que token em `localStorage` é vulnerável a XSS e que aplicações reais usam cookie `httpOnly`.
+4. **Rotas:** `react-router-dom`, com componente **`ProtectedRoute`** que redireciona para `/login` e **devolve o usuário à página que ele tentou abrir**.
+5. **Estilo:** **CSS Modules** (nativo do Vite), mobile-first, responsivo. Toda tela que busca dado tem estados de **carregando, erro e vazio**. Rótulos em todos os campos e foco visível.
+6. **Nenhum dado pessoal real.** Os nomes do JSONPlaceholder são fictícios. Aviso de simulação acadêmica no **rodapé do portal** e no **README**.
+
+Fatos verificados que afetam a implementação (2026-09-23):
+
+- `https://jsonplaceholder.typicode.com/users` responde **HTTP 200**, JSON com **10 usuários** e campos `id, name, username, email, address, phone, website, company`. O dashboard vai contar 10 pacientes.
+
+---
+
+## 5. Regras de trabalho (valem para toda a sessão)
+
+1. **Nunca invente URL, versão de pacote ou link.** Versões: consultar o que é atual no npm no momento e registrar (seção 7). Link que não se tem vira `TODO(humano)`.
+2. **Não fazer push nem criar repositório remoto** sem autorização explícita.
+3. **Commits pequenos e temáticos**, Conventional Commits em português, imperativo (ex.: `feat(auth): adiciona AuthContext com JWT fake`).
+4. **Antes de encerrar cada etapa, listar o que ficou pendente para o humano.**
+5. Não instalar dependência sem registrá-la na seção 7 e fixá-la em versão exata no `package.json`.
+6. Requisito ambíguo: **perguntar**, não inventar escopo.
+
+---
+
+## 6. Estrutura de pastas
+
+```
+grupo-zion-cardioia-portal/
+├── AGENTS.md              # este arquivo
+├── CLAUDE.md              # só `@AGENTS.md`
+├── README.md              # ENTREGÁVEL: instalação, execução, integrantes, vídeo
+├── .nvmrc                 # versão do Node usada no desenvolvimento
+├── index.html
+├── package.json           # versões exatas (sem ^)
+├── vite.config.js
+├── .oxlintrc.json         # lint padrão do create-vite (npm run lint)
+├── docs/
+│   └── arquitetura.md     # diagrama de contexts/services/pages/components e fluxo de auth
+├── public/
+│   └── favicon.svg
+└── src/
+    ├── main.jsx           # ponto de entrada
+    ├── App.jsx            # placeholder na Etapa 1; rotas na Etapa 2
+    ├── index.css          # só reset e foco visível; o resto é CSS Modules
+    ├── contexts/          # AuthContext, AppointmentsContext
+    ├── components/        # ProtectedRoute, layout, peças de UI (+ *.module.css)
+    ├── services/          # cliente JSONPlaceholder + adaptador; JWT fake
+    └── pages/             # Login, Dashboard, Pacientes, Agendamento
+```
+
+Cada pasta de `src/` tem um `README.md` curto explicando o que vai nela.
+
+---
+
+## 7. Versões registradas (Etapa 1, 2026-09-23)
+
+Consultadas com `npm view <pacote> version` no momento da criação; fixadas **exatas** no `package.json`.
+
+| Item | Versão |
+|---|---|
+| Node (local, `.nvmrc`) | 24.19.0 |
+| npm (local) | 11.17.0 |
+| create-vite (scaffold, template `react`) | 9.2.1 |
+| vite | 8.3.0 (exige Node `^20.19.0 \|\| >=22.12.0`, registrado em `engines`) |
+| @vitejs/plugin-react | 6.1.1 |
+| react / react-dom | 19.3.0 |
+| react-router-dom | 7.18.4 |
+| oxlint | 1.85.0 |
+| @types/react / @types/react-dom | 19.3.0 |
+
+---
+
+## 8. Checklist antes de encerrar qualquer etapa
+
+1. Cumpri as regras de trabalho da seção 5?
+2. Todo link não verificado está como `TODO(humano)` e listado na resposta?
+3. Atualizei a tabela de estado da seção 2?
+4. `npm run build` passa sem erro?
+5. Listei o que ficou pendente para o humano?
