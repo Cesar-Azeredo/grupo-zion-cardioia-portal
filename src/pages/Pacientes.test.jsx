@@ -26,7 +26,7 @@ describe('Pacientes', () => {
     expect(ana).toHaveTextContent('Eletrocardiograma')
     const bia = screen.getByRole('heading', { name: 'Bia' }).closest('li')
     expect(bia).toHaveTextContent('Sem consulta agendada')
-    expect(bia).not.toHaveTextContent(/sexo/i)
+    expect(bia).not.toHaveTextContent(/sexo|idade|simulad/i)
     expect(within(bia).getByRole('link', { name: 'Agendar consulta para Bia' })).toHaveAttribute(
       'href',
       '/agendamento?paciente=2',

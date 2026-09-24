@@ -72,7 +72,7 @@ Idioma dos entregáveis e da interface: **português do Brasil**.
 
 1. **Pacientes:** consumo **real** do JSONPlaceholder (`/users`) em `src/services/`, com um **adaptador** que converte usuário em paciente. Campos clínicos simulados (ex.: próxima consulta, status) gerados de forma **determinística a partir do `id`**, sem aleatoriedade.
    - **Minimização (aprovada pelo humano em 2026-09-24):** o adaptador **descarta `email`, `phone` e `address`** (e os demais campos do usuário) e mantém só **`id` e `name`**. É a aplicação do **princípio da necessidade da LGPD** (Lei 13.709/2018, art. 6º, III: tratar só o mínimo necessário à finalidade). Os dados do JSONPlaceholder são fictícios — a decisão **demonstra o hábito de minimização, não mitiga risco real**.
-   - Campos clínicos simulados (aprovado em 2026-09-24): só **dados demográficos** (ex.: idade, sexo), marcados como simulados na interface. **Proibido gerar diagnóstico, nível de risco ou qualquer rótulo clínico** — o portal não diagnostica, e rótulo inventado numa tela de saúde confunde.
+   - ~~Campos clínicos simulados (idade, sexo)~~ — **removidos** (sexo na Etapa 3, idade no ajuste final, ambos em 2026-09-24). Continua **proibido gerar diagnóstico, nível de risco ou qualquer rótulo clínico** — o portal não diagnostica, e rótulo inventado numa tela de saúde confunde.
 2. **Consultas:** estado num **`AppointmentsContext` com `useReducer`** (ações de agendar e cancelar), porque o dashboard precisa contar consultas criadas no formulário. O formulário usa **`useState`** para os campos e dispara ações no reducer. Validação: campos obrigatórios e data não pode estar no passado.
 3. **Autenticação:** **`AuthContext`** com JWT fake (header.payload.assinatura em base64, com `exp`), gravado no `localStorage` e **validado na carga** (token expirado = deslogado). Credenciais de demonstração documentadas no README. README com aviso de que token em `localStorage` é vulnerável a XSS e que aplicações reais usam cookie `httpOnly`.
 4. **Rotas:** `react-router-dom`, com componente **`ProtectedRoute`** que redireciona para `/login` e **devolve o usuário à página que ele tentou abrir**.
@@ -89,7 +89,7 @@ Decisões de implementação da Etapa 2 (2026-09-24):
 - **Tipos de consulta:** consulta cardiológica, eletrocardiograma, ecocardiograma (os três exemplos do humano).
 - **Credenciais de demonstração:** `demo@cardioia.test` / `cardio123` (domínio `.test`, reservado para testes). Sessão de 1 hora.
 - **Chaves do localStorage:** `cardioia.auth.token.v1` e `cardioia.consultas.v1` (versionadas).
-- ~~Idade e sexo simulados~~ — **sexo removido na Etapa 3** (abaixo). A idade simulada continua: `30 + (id·37 mod 55)`.
+- ~~Idade e sexo simulados~~ — **removidos** (sexo na Etapa 3, idade no ajuste final; ver abaixo).
 
 Decisões da Etapa 3 (aprovadas pelo humano em 2026-09-24):
 
@@ -97,6 +97,9 @@ Decisões da Etapa 3 (aprovadas pelo humano em 2026-09-24):
 - **`PatientsProvider`:** a lista de pacientes é buscada **uma vez por sessão**. O provider fica em volta das rotas protegidas (`App.jsx`, dentro do `ProtectedRoute`): só busca depois do login e é desmontado no logout. `AbortController` no provider. `usePacientes()` virou o hook de acesso ao contexto (`contexts/usePacientes.js`). `src/hooks/` ficou só com `useTituloPagina`.
 - **Roteamento: `HashRouter`** (e não `BrowserRouter` + `404.html`), porque no Pages o fallback responde **HTTP 404** em todo link direto; com hash, tudo responde 200. Comparação em `docs/arquitetura.md`, seção 4. `base` do Vite: `/grupo-zion-cardioia-portal/`, também em dev.
 - **Workflow do Pages:** lint → testes → build → deploy; falha em qualquer passo impede a publicação. Actions fixadas nas versões de `gh api repos/<action>/releases/latest` em 2026-09-24: `actions/checkout@v7.0.1`, `actions/setup-node@v7.0.0`, `actions/configure-pages@v6.0.0`, `actions/upload-pages-artifact@v5.0.0`, `actions/deploy-pages@v5.0.1`. Node do CI lido do `.nvmrc`.
+- **Idade simulada removida** (ajuste final, aprovado pelo humano em 2026-09-24), pelo mesmo princípio da necessidade: nenhuma funcionalidade a usava. Selos "SIMULADO" removidos. **Consequência: nenhum dado na tela é inventado** — cada informação vem da API (nome; código = `id` formatado) ou de uma ação do usuário no portal (próxima consulta).
+- **Nomes do JSONPlaceholder não são alterados**, mesmo os com "Mrs." ou "V": limpar nome da API seria manipular o dado. Há teste que garante isso.
+- **Workflow em `ubuntu-24.04`** (não `ubuntu-latest`): o GitHub passa o `latest` para Ubuntu 26 a partir de 19/10/2026; fixar a imagem evita que o deploy mude de comportamento sem um commit.
 - **Capturas** geradas contra a versão publicada (`BASE_URL=… npm run screenshots`), que também confere o link direto para rota protegida, o retorno após o login e o recarregar numa rota interna.
 
 Fatos verificados que afetam a implementação (2026-09-23):

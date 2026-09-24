@@ -36,7 +36,7 @@ Mapa do uso de hooks no portal (estado da Etapa 2). Caminhos relativos a `src/`.
 | Hook | Arquivo | O que encapsula | Usado em |
 |---|---|---|---|
 | `useAuth()` | `contexts/useAuth.js` | `useContext(AuthContext)`; **lança erro claro** se usado fora do `<AuthProvider>` | `ProtectedRoute`, `Layout`, `Login`, `Dashboard` |
-| `useAppointments()` | `contexts/useAppointments.js` | `useContext(AppointmentsContext)`; lança erro claro fora do provider. Expõe `consultas`, `futuras`, `doDia`, `porTipo`, `proximaPorPaciente`, `agendar`, `cancelar` | `Agendamento`, `Dashboard`, `Pacientes` (próxima consulta de cada paciente) |
+| `useAppointments()` | `contexts/useAppointments.js` | `useContext(AppointmentsContext)`; lança erro claro fora do provider. Expõe `consultas`, `futuras`, `doDia`, `porTipo`, `proximaPorPaciente`, `agendar`, `cancelar` | `Agendamento`, `Dashboard`, `Pacientes` (próxima consulta de cada paciente — o campo que substituiu idade e sexo simulados) |
 | `usePacientes()` | `contexts/usePacientes.js` | `useContext(PatientsContext)`; lança erro claro fora do provider. Devolve `{ pacientes, status, erro, recarregar }` | `Pacientes`, `Agendamento` (lista do select), `Dashboard` (total) |
 | `useTituloPagina(titulo)` | `hooks/useTituloPagina.js` | `useEffect` que ajusta `document.title` | todas as páginas |
 
@@ -47,4 +47,4 @@ Mapa do uso de hooks no portal (estado da Etapa 2). Caminhos relativos a `src/`.
 - **Reducer puro:** o instante atual (`agora`) e o `id` da consulta chegam **na ação**; o reducer não chama `Date.now()` nem gera aleatoriedade. Por isso ele é testado sem mock de relógio.
 - **Derivar em vez de guardar:** lista filtrada, consultas futuras e distribuição por tipo são calculadas a partir do estado, não armazenadas em outro `useState`.
 - **Uma busca por sessão:** a lista de pacientes vive no `PatientsProvider`, montado em volta das rotas protegidas. Navegar entre Painel, Pacientes e Agendar reaproveita a mesma lista (há teste que conta as chamadas a `fetch`: uma só). Antes (Etapa 2), cada página chamava sua própria busca.
-- **Campo derivado, não inventado:** a "próxima consulta" de cada paciente sai de `proximaPorPaciente`, calculado a partir das consultas futuras; não é guardado em estado próprio.
+- **Campo derivado, não inventado:** a "próxima consulta" de cada paciente sai de `proximaPorPaciente`, calculado a partir das consultas futuras; não é guardado em estado próprio. É o único dado do cartão de paciente que não vem da API — e vem de uma ação do usuário, não de uma fórmula.

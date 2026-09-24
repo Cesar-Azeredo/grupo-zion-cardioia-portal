@@ -22,21 +22,19 @@ describe('adaptarPaciente', () => {
     expect(JSON.stringify(paciente)).not.toMatch(/Sincere|770-736|Kulas|Gwenborough/)
   })
 
-  it('mantém só id e nome da origem, mais código e idade simulada', () => {
-    expect(Object.keys(adaptarPaciente(USUARIO)).sort()).toEqual(['codigo', 'id', 'idade', 'nome'])
-    expect(adaptarPaciente(USUARIO)).toMatchObject({ id: 1, nome: 'Leanne Graham', codigo: 'PAC-0001' })
+  it('mantém só id e nome da origem, mais o código (id formatado)', () => {
+    expect(Object.keys(adaptarPaciente(USUARIO)).sort()).toEqual(['codigo', 'id', 'nome'])
+    expect(adaptarPaciente(USUARIO)).toEqual({ id: 1, nome: 'Leanne Graham', codigo: 'PAC-0001' })
   })
 
-  it('campos simulados são determinísticos a partir do id', () => {
-    expect(adaptarPaciente(USUARIO)).toEqual(adaptarPaciente({ ...USUARIO }))
-    const idades = Array.from({ length: 10 }, (_, i) => adaptarPaciente({ id: i + 1, name: 'x' }).idade)
-    idades.forEach((idade) => expect(idade).toBeGreaterThanOrEqual(30))
-    idades.forEach((idade) => expect(idade).toBeLessThanOrEqual(84))
-  })
-
-  it('não gera sexo, diagnóstico, risco nem rótulo clínico', () => {
+  it('não inventa campo: sem idade, sexo, diagnóstico, risco nem rótulo clínico', () => {
     const chaves = Object.keys(adaptarPaciente(USUARIO)).join(' ')
-    expect(chaves).not.toMatch(/sexo|genero|diagn|risco|status|condic|doenc/i)
+    expect(chaves).not.toMatch(/idade|sexo|genero|diagn|risco|status|condic|doenc/i)
+  })
+
+  it('preserva o nome da API sem limpeza (títulos e sufixos ficam)', () => {
+    expect(adaptarPaciente({ id: 6, name: 'Mrs. Dennis Schulist' }).nome).toBe('Mrs. Dennis Schulist')
+    expect(adaptarPaciente({ id: 8, name: 'Nicholas Runolfsdottir V' }).nome).toBe('Nicholas Runolfsdottir V')
   })
 })
 

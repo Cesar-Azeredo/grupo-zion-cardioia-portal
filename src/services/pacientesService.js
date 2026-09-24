@@ -5,17 +5,13 @@
 // company são descartados. Os dados do JSONPlaceholder já são fictícios; a
 // regra demonstra o hábito, não mitiga risco real.
 //
-// A idade é SIMULADA, derivada deterministicamente do id (mesmo id, mesmo
-// valor, sem Math.random). Sexo NÃO entra: nenhuma funcionalidade o usa
-// (princípio da necessidade), inferi-lo pelo nome seria outro viés e um valor
-// derivado do id contradiria o nome. Nenhum diagnóstico, nível de risco ou
-// rótulo clínico é gerado: o portal não diagnostica.
+// Nenhum campo é inventado: o paciente tem só o que vem da API (id e nome,
+// este SEM limpeza — "Mrs." e "V" ficam, porque limpar nome da API seria
+// manipular o dado) e o código, que é o id formatado. Idade e sexo simulados
+// foram removidos pelo mesmo princípio: nenhuma funcionalidade os usa. Nenhum
+// diagnóstico, nível de risco ou rótulo clínico é gerado.
 
 export const URL_PACIENTES = 'https://jsonplaceholder.typicode.com/users'
-
-export function idadeSimulada(id) {
-  return 30 + ((id * 37) % 55) // 30 a 84 anos
-}
 
 export function adaptarPaciente(usuario) {
   const id = Number(usuario.id)
@@ -23,7 +19,6 @@ export function adaptarPaciente(usuario) {
     id,
     nome: String(usuario.name),
     codigo: `PAC-${String(id).padStart(4, '0')}`,
-    idade: idadeSimulada(id),
   }
 }
 

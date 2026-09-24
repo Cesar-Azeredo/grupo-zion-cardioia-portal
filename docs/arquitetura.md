@@ -83,11 +83,12 @@ flowchart TD
 
 ### Adaptador usuário → paciente
 
-`pacientesService` busca `/users` e converte cada usuário num paciente `{ id, nome, codigo, idade }`:
+`pacientesService` busca `/users` e converte cada usuário num paciente `{ id, nome, codigo }`:
 
 - **Minimização (LGPD, art. 6º, III):** só `id` e `name` são aproveitados; `email`, `phone`, `address` e os demais campos são descartados.
-- **A idade é simulada**, saída de uma função **determinística do `id`** (mesmo `id`, mesmo paciente, sem `Math.random`). A tela a marca como "simulado".
-- **Sexo não entra** (decisão da Etapa 3): nenhuma funcionalidade o usa (princípio da necessidade); inferi-lo pelo nome seria outro viés, e o valor derivado do `id` contradizia o nome.
+- **Nenhum dado na tela é inventado.** Cada informação vem da API (nome; código = `id` formatado como `PAC-0001`) ou de uma ação do usuário no portal (próxima consulta).
+- **Sexo e idade simulados foram removidos** (Etapa 3 e ajuste final): nenhuma funcionalidade os usava (princípio da necessidade). Inferir sexo pelo nome seria outro viés, e o valor derivado do `id` contradizia o nome.
+- **O nome é exibido como a API entrega**, inclusive "Mrs. Dennis Schulist" e "Nicholas Runolfsdottir V": limpar nome vindo da API seria manipular o dado.
 - No lugar, a lista mostra um campo **derivado, não inventado**: a próxima consulta agendada do paciente, lida do `AppointmentsContext`, ou "sem consulta agendada".
 - **Nenhum diagnóstico, nível de risco ou rótulo clínico** é gerado: o portal não diagnostica.
 

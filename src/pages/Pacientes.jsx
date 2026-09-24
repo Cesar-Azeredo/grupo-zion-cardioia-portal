@@ -24,8 +24,8 @@ export function Pacientes() {
       <div className={ui.cabecalhoPagina}>
         <h1>Pacientes</h1>
         <p>
-          Nomes fictícios do JSONPlaceholder. A idade é <strong>simulada</strong> a partir do código do
-          paciente; a próxima consulta vem dos agendamentos feitos neste portal.
+          Nome e código vêm do JSONPlaceholder (nomes fictícios, exibidos como a API os entrega). A próxima
+          consulta vem dos agendamentos feitos neste portal. Nenhum dado desta tela é inventado.
         </p>
       </div>
 
@@ -76,12 +76,6 @@ export function Pacientes() {
                       <div>
                         <dt>Código</dt>
                         <dd>{p.codigo}</dd>
-                      </div>
-                      <div>
-                        <dt>
-                          Idade <span className={ui.selo}>simulado</span>
-                        </dt>
-                        <dd>{p.idade} anos</dd>
                       </div>
                       <div className={styles.proxima}>
                         <dt>Próxima consulta</dt>

@@ -2,7 +2,7 @@
 
 Acesso a dados e lógica sem React (funções puras, testáveis isoladamente).
 
-- `pacientesService.js` — cliente do JSONPlaceholder (`/users`) + **adaptador** usuário → paciente. Mantém só `id` e `name` (minimização, LGPD art. 6º, III); idade **simulada**, derivada deterministicamente do `id`. Sem sexo (não é usado por nenhuma funcionalidade) e sem rótulo clínico.
+- `pacientesService.js` — cliente do JSONPlaceholder (`/users`) + **adaptador** usuário → paciente. Mantém só `id` e `name` (minimização, LGPD art. 6º, III); mais o código (o `id` formatado). Nenhum campo inventado: sem idade, sem sexo, sem rótulo clínico. Nomes exibidos como a API os entrega.
 - `jwtFake.js` — gera, decodifica e valida o JWT fake (header.payload.assinatura em base64url, com `exp`).
 - `authService.js` — credenciais de demonstração e emissão do token.
 - `storage.js` — leitura e gravação no `localStorage` com `try/catch`.

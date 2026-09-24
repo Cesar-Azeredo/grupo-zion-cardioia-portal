@@ -42,7 +42,7 @@ A sessão dura 1 hora. As credenciais também aparecem na tela de login.
 |---|---|
 | **Autenticação simulada via Context API, com JWT fake no localStorage** | `AuthContext` + `useAuth()`. Token `header.payload.assinatura` em base64url, com `exp`, gravado no `localStorage` e validado na carga: expirado, malformado ou adulterado = deslogado. Logout automático no vencimento e botão "Sair" no cabeçalho. |
 | **Proteção de rotas com AuthContext** (dados só com usuário logado) | `ProtectedRoute` em volta de Painel, Pacientes e Agendar: sem login, manda para `/login` e, depois do login, **devolve à página que se tentou abrir**. A lista de pacientes só é buscada depois do login. |
-| **Listagem de pacientes com API fake** | Consumo real de `https://jsonplaceholder.typicode.com/users` pelo `PatientsProvider` (**uma busca por sessão**, com `AbortController`), adaptada por `services/pacientesService.js`. Busca por nome sem diferenciar acentos; estados de carregando, erro (com "Tentar de novo") e vazio. Cada paciente mostra a **próxima consulta agendada** (derivada das consultas) e um botão "Agendar". |
+| **Listagem de pacientes com API fake** | Consumo real de `https://jsonplaceholder.typicode.com/users` pelo `PatientsProvider` (**uma busca por sessão**, com `AbortController`), adaptada por `services/pacientesService.js`. Busca por nome sem diferenciar acentos; estados de carregando, erro (com "Tentar de novo") e vazio. Cada paciente mostra nome e código da API, a **próxima consulta agendada** (derivada das consultas) e um botão "Agendar" — nenhum campo inventado. |
 | **Formulário de agendamento com useState e useReducer** | Campos em `useState`; consultas num `AppointmentsContext` com `useReducer` (agendar e cancelar). Regras **no reducer**: campos obrigatórios, data e hora não podem estar no passado, o mesmo paciente não pode ter duas consultas no mesmo horário. Erros por campo acessíveis; persistência no `localStorage` com chave versionada. |
 | **Dashboard com contagem de pacientes e de consultas agendadas** | Total de pacientes (do `PatientsContext`), consultas agendadas futuras, consultas de hoje e distribuição por tipo (dos seletores do `AppointmentsContext`). |
 | **Estilização com CSS Modules** | Um `.module.css` por componente/página; mobile-first; navegação que cabe em 390px; rótulo em todo campo, foco visível, alvos de toque de 44px, contraste AA. |
@@ -121,9 +121,10 @@ scripts/          screenshots.mjs (Playwright)
 
 O adaptador em `src/services/pacientesService.js` aproveita do JSONPlaceholder **só `id` e `name`** e **descarta `email`, `phone`, `address`** e os demais campos, aplicando o **princípio da necessidade da LGPD** (Lei 13.709/2018, art. 6º, III: tratar só o mínimo necessário à finalidade). Os dados do JSONPlaceholder são fictícios: a decisão **demonstra o hábito de minimização, não mitiga risco real**.
 
-- **Sexo não é exibido:** nenhuma funcionalidade o usa. Inferir pelo nome seria outro viés, e um valor derivado do `id` contradiria o nome.
-- **Idade é simulada** (derivada deterministicamente do `id`) e marcada como "simulado" na tela.
-- **A próxima consulta é derivada, não inventada:** vem das consultas agendadas no próprio portal.
+**Consequência: nenhum dado na tela é inventado.** Cada informação vem da API (nome e código — o código é o `id` formatado, `PAC-0001`) ou de uma ação do usuário no portal (a próxima consulta, derivada dos agendamentos).
+
+- **Sexo e idade não são exibidos:** versões anteriores mostravam valores simulados, derivados do `id`; foram removidos porque nenhuma funcionalidade os usa. Inferir sexo pelo nome seria outro viés, e o valor derivado do `id` contradizia o nome.
+- **Os nomes aparecem exatamente como o JSONPlaceholder os entrega**, inclusive "Mrs. Dennis Schulist" e "Nicholas Runolfsdottir V": limpar nome vindo da API seria manipular o dado.
 - **O portal não gera diagnóstico, nível de risco nem rótulo clínico.**
 
 ### Token no localStorage: aviso de segurança
