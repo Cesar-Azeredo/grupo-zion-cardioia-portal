@@ -1,0 +1,97 @@
+.cartoes {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--espaco-3);
+  margin-bottom: var(--espaco-4);
+}
+
+.valor {
+  margin: 0;
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.estadoCartao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espaco-2);
+  min-height: 2.5rem;
+  margin: 0;
+  color: var(--cor-texto-suave);
+}
+
+.estadoCartao p {
+  margin: 0;
+}
+
+.distribuicao h2 {
+  font-size: 1.125rem;
+}
+
+.semDados {
+  margin: 0;
+  color: var(--cor-texto-suave);
+}
+
+.barras {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Rótulo em cima e barra + número embaixo no celular; tudo numa linha no desktop. */
+.barra {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    'rotulo rotulo'
+    'trilho numero';
+  align-items: center;
+  column-gap: var(--espaco-3);
+  row-gap: var(--espaco-1);
+}
+
+.rotuloBarra {
+  grid-area: rotulo;
+}
+
+.trilho {
+  grid-area: trilho;
+  height: 0.75rem;
+  border-radius: 4px;
+  background: var(--cor-fundo);
+  overflow: hidden;
+}
+
+.preenchimento {
+  display: block;
+  height: 100%;
+  min-width: 2px;
+  border-radius: 0 4px 4px 0;
+  background: var(--cor-primaria);
+}
+
+.numero {
+  grid-area: numero;
+  min-width: 2ch;
+  text-align: right;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 40rem) {
+  .cartoes {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .barra {
+    grid-template-columns: 12rem 1fr 3ch;
+    grid-template-areas: 'rotulo trilho numero';
+  }
+}
