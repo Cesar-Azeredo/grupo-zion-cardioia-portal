@@ -30,10 +30,11 @@ Idioma dos entregáveis e da interface: **português do Brasil**.
 
 | Campo | Valor |
 |---|---|
-| **Etapa em andamento** | **Etapa 2 — funcionalidades** concluída em 2026-09-24, aguardando revisão do humano |
-| Etapas concluídas | Etapa 1 — fundação (2026-09-23); Etapa 2 — autenticação, pacientes, agendamento, painel, testes, capturas, `docs/hooks.md` (2026-09-24) |
-| Próxima etapa | a definir pelo humano |
+| **Etapa em andamento** | **Etapa 3 — ajustes e publicação** concluída em 2026-09-24, aguardando revisão do humano |
+| Etapas concluídas | Etapa 1 — fundação (2026-09-23); Etapa 2 — autenticação, pacientes, agendamento, painel, testes, capturas, `docs/hooks.md` (2026-09-24); Etapa 3 — sem sexo, próxima consulta, `PatientsProvider`, GitHub Pages, README final (2026-09-24) |
+| Próxima etapa | vídeo (humano) |
 | Repositório remoto | **público**: `github.com/Cesar-Azeredo/grupo-zion-cardioia-portal` (criado com `gh` em 2026-09-24, HTTP 200 sem autenticação) |
+| Publicação | **GitHub Pages**: `https://cesar-azeredo.github.io/grupo-zion-cardioia-portal/` (workflow `.github/workflows/pages.yml`; HTTP 200 na raiz e em `#/pacientes`, 2026-09-24) |
 | Vídeo | **não gravado** — `TODO(humano)` no README |
 
 > **Mantenha esta tabela atualizada.** É o primeiro lugar que qualquer agente olha.
@@ -82,13 +83,21 @@ Decisões de implementação da Etapa 2 (2026-09-24):
 
 - **Pasta `src/hooks/`** para hooks próprios que não são de contexto (`usePacientes`, `useTituloPagina`), além das quatro pastas exigidas.
 - **Cada contexto em três arquivos** (`XContext.js`, `XProvider.jsx`, `useX.js`), para o lint `react/only-export-components` passar e o hook de acesso falhar com mensagem clara fora do provider.
-- **Pacientes não ficam num contexto:** cada página usa `usePacientes` (`useEffect` + `AbortController`, cancela ao sair). As contagens de **consultas** do painel vêm dos seletores do `AppointmentsContext`; o total de pacientes vem de `usePacientes`.
+- ~~Pacientes não ficam num contexto~~ — **substituído na Etapa 3** pelo `PatientsProvider` (abaixo).
 - **Sessão sem estado de "carregando":** o `AuthProvider` valida o token na inicialização preguiçosa do `useState`, antes do primeiro render. Um `useEffect` agenda o logout no instante do `exp`.
 - **Regras de agendamento no reducer puro** (`agora` e `id` chegam na ação). `agendar()` roda o próprio reducer para obter os erros por campo antes de despachar.
 - **Tipos de consulta:** consulta cardiológica, eletrocardiograma, ecocardiograma (os três exemplos do humano).
 - **Credenciais de demonstração:** `demo@cardioia.test` / `cardio123` (domínio `.test`, reservado para testes). Sessão de 1 hora.
 - **Chaves do localStorage:** `cardioia.auth.token.v1` e `cardioia.consultas.v1` (versionadas).
-- **Idade e sexo simulados** saem do `id` (`30 + (id·37 mod 55)` e paridade de `id·7`) e **não têm relação com o nome** — por isso "Leanne Graham" aparece como "Masculino". Decisão consciente: inferir sexo pelo nome seria outro viés; a tela avisa que os campos são simulados.
+- ~~Idade e sexo simulados~~ — **sexo removido na Etapa 3** (abaixo). A idade simulada continua: `30 + (id·37 mod 55)`.
+
+Decisões da Etapa 3 (aprovadas pelo humano em 2026-09-24):
+
+- **Sexo removido** do paciente: nenhuma funcionalidade o usa (princípio da necessidade, LGPD art. 6º, III); inferi-lo pelo nome seria outro viés; o valor derivado do `id` contradizia o nome. No lugar, a lista mostra um campo **derivado**: a próxima consulta do paciente (seletor `proximaPorPaciente` do `AppointmentsContext`) ou "sem consulta agendada", e o botão "Agendar" (`/agendamento?paciente=<id>`).
+- **`PatientsProvider`:** a lista de pacientes é buscada **uma vez por sessão**. O provider fica em volta das rotas protegidas (`App.jsx`, dentro do `ProtectedRoute`): só busca depois do login e é desmontado no logout. `AbortController` no provider. `usePacientes()` virou o hook de acesso ao contexto (`contexts/usePacientes.js`). `src/hooks/` ficou só com `useTituloPagina`.
+- **Roteamento: `HashRouter`** (e não `BrowserRouter` + `404.html`), porque no Pages o fallback responde **HTTP 404** em todo link direto; com hash, tudo responde 200. Comparação em `docs/arquitetura.md`, seção 4. `base` do Vite: `/grupo-zion-cardioia-portal/`, também em dev.
+- **Workflow do Pages:** lint → testes → build → deploy; falha em qualquer passo impede a publicação. Actions fixadas nas versões de `gh api repos/<action>/releases/latest` em 2026-09-24: `actions/checkout@v7.0.1`, `actions/setup-node@v7.0.0`, `actions/configure-pages@v6.0.0`, `actions/upload-pages-artifact@v5.0.0`, `actions/deploy-pages@v5.0.1`. Node do CI lido do `.nvmrc`.
+- **Capturas** geradas contra a versão publicada (`BASE_URL=… npm run screenshots`), que também confere o link direto para rota protegida, o retorno após o login e o recarregar numa rota interna.
 
 Fatos verificados que afetam a implementação (2026-09-23):
 
@@ -124,19 +133,21 @@ grupo-zion-cardioia-portal/
 │   ├── hooks.md           # cada hook: onde é usado e por quê
 │   └── screenshots/       # capturas 390px e 1280px (npm run screenshots)
 ├── scripts/
-│   └── screenshots.mjs    # Playwright + servidor do Vite
+│   └── screenshots.mjs    # Playwright; local (Vite) ou publicado (BASE_URL)
+├── .github/workflows/
+│   └── pages.yml          # lint, testes, build e deploy no GitHub Pages
 ├── public/
 │   └── favicon.svg
 └── src/
     ├── main.jsx           # ponto de entrada
-    ├── App.jsx            # rotas (react-router-dom)
+    ├── App.jsx            # rotas (react-router-dom); PatientsProvider em volta das protegidas
     ├── index.css          # tokens de cor/espaço, reset e foco visível; o resto é CSS Modules
     ├── test/setup.js      # jest-dom + limpeza entre testes
-    ├── contexts/          # AuthContext, AppointmentsContext (+ provider, hook, reducer)
+    ├── contexts/          # AuthContext, AppointmentsContext, PatientsContext (+ provider, hook, reducer)
     ├── components/        # ProtectedRoute, Layout, Rodape, Campo, EstadoTela, CartaoIndicador
     ├── services/          # JSONPlaceholder + adaptador, JWT fake, auth demo, storage, datas
     ├── pages/             # Login, Dashboard, Pacientes, Agendamento
-    └── hooks/             # usePacientes, useTituloPagina
+    └── hooks/             # useTituloPagina (hooks que não são de contexto)
 ```
 
 Cada pasta de `src/` tem um `README.md` curto explicando o que vai nela. Testes ficam ao lado do código (`*.test.js[x]`).
