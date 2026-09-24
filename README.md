@@ -16,6 +16,12 @@ Interface de um portal que simula a rotina de um centro de diagnóstico cardiol�
 
 Tutor: Andre Godoy · Coordenadora: Ana Cristina dos Santos
 
+## Privacidade e minimização de dados
+
+A lista de pacientes vem do endpoint `/users` do JSONPlaceholder. O adaptador em `src/services/` **descarta `email`, `phone` e `address`** e mantém só `id` e `name`, aplicando o **princípio da necessidade da LGPD** (Lei 13.709/2018, art. 6º, III: tratar só o mínimo necessário à finalidade). Os dados do JSONPlaceholder são fictícios: a decisão **demonstra o hábito de minimização, não mitiga risco real**.
+
+Idade e sexo exibidos na tela são **simulados**, derivados de forma determinística do `id`. O portal **não gera diagnóstico, nível de risco nem rótulo clínico**.
+
 ## Vídeo de demonstração
 
 > ⚠️ TODO(humano): colar aqui o link do vídeo no YouTube (não listado, até 4 min)
