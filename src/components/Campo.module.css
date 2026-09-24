@@ -1,0 +1,45 @@
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-1);
+  margin-bottom: var(--espaco-4);
+}
+
+.rotulo {
+  font-weight: 600;
+}
+
+.obrigatorio {
+  color: var(--cor-erro);
+}
+
+.dica {
+  margin: 0;
+  color: var(--cor-texto-suave);
+  font-size: 0.875rem;
+}
+
+.controle {
+  width: 100%;
+  min-height: 44px;
+  padding: var(--espaco-2) var(--espaco-3);
+  border: 1px solid var(--cor-borda-forte);
+  border-radius: var(--raio);
+  background: var(--cor-fundo-cartao);
+}
+
+textarea.controle {
+  min-height: 6rem;
+  resize: vertical;
+}
+
+.controle[aria-invalid='true'] {
+  border: 2px solid var(--cor-erro);
+}
+
+.erro {
+  margin: 0;
+  color: var(--cor-erro);
+  font-size: 0.875rem;
+  font-weight: 600;
+}

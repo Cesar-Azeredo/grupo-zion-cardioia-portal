@@ -1,0 +1,80 @@
+.pagina {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.conteudo {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: var(--espaco-4);
+}
+
+.painel {
+  width: 100%;
+  max-width: 26rem;
+  padding: var(--espaco-6) var(--espaco-4);
+  background: var(--cor-fundo-cartao);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  align-self: flex-start;
+}
+
+.marca {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--cor-primaria);
+}
+
+.subtitulo {
+  color: var(--cor-texto-suave);
+}
+
+.entrar {
+  width: 100%;
+}
+
+.demo {
+  margin-top: var(--espaco-6);
+  padding: var(--espaco-4);
+  border: 1px dashed var(--cor-aviso-borda);
+  border-radius: var(--raio);
+  background: var(--cor-aviso-fundo);
+  font-size: 0.875rem;
+}
+
+.demo h2 {
+  font-size: 1rem;
+}
+
+.demo dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--espaco-1) var(--espaco-3);
+  margin: 0 0 var(--espaco-3);
+}
+
+.demo dt {
+  font-weight: 600;
+}
+
+.demo dd {
+  margin: 0;
+  word-break: break-all;
+}
+
+.demo p {
+  margin: 0;
+  color: var(--cor-texto-suave);
+}
+
+@media (min-width: 48rem) {
+  .conteudo {
+    padding-top: var(--espaco-8);
+  }
+
+  .painel {
+    padding: var(--espaco-8);
+  }
+}

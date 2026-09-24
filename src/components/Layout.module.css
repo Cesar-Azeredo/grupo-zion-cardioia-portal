@@ -1,0 +1,134 @@
+/* Mobile-first: em 390px a marca e o "Sair" ficam numa linha e a navegação
+   em outra, com três itens que cabem sem rolagem horizontal. */
+.pagina {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.pular {
+  position: absolute;
+  left: var(--espaco-2);
+  top: -3rem;
+  padding: var(--espaco-2) var(--espaco-3);
+  background: var(--cor-fundo-cartao);
+  border: 2px solid var(--cor-foco);
+  border-radius: var(--raio);
+  z-index: 10;
+}
+
+.pular:focus {
+  top: var(--espaco-2);
+}
+
+.cabecalho {
+  background: var(--cor-fundo-cartao);
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-3);
+  padding: var(--espaco-3) var(--espaco-4);
+  max-width: var(--largura-max);
+  margin: 0 auto;
+}
+
+.marca {
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--cor-primaria);
+}
+
+.sessao {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-3);
+  min-width: 0;
+}
+
+.usuario {
+  display: none;
+  color: var(--cor-texto-suave);
+  font-size: 0.875rem;
+}
+
+.sair {
+  min-height: 44px;
+  padding: 0 var(--espaco-4);
+  border: 1px solid var(--cor-borda-forte);
+  border-radius: var(--raio);
+  background: var(--cor-fundo-cartao);
+  cursor: pointer;
+}
+
+.sair:hover {
+  background: var(--cor-fundo);
+}
+
+.nav {
+  max-width: var(--largura-max);
+  margin: 0 auto;
+  padding: 0 var(--espaco-2);
+}
+
+.nav ul {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav li {
+  flex: 1;
+}
+
+.nav a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 var(--espaco-3);
+  border-bottom: 3px solid transparent;
+  color: var(--cor-texto);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.nav a:hover {
+  color: var(--cor-primaria);
+}
+
+.nav a.ativo {
+  border-bottom-color: var(--cor-primaria);
+  color: var(--cor-primaria);
+  font-weight: 700;
+}
+
+.conteudo {
+  width: 100%;
+  max-width: var(--largura-max);
+  margin: 0 auto;
+  padding: var(--espaco-4);
+  flex: 1;
+}
+
+.conteudo:focus {
+  outline: none;
+}
+
+@media (min-width: 48rem) {
+  .usuario {
+    display: inline;
+  }
+
+  .nav li {
+    flex: 0 0 auto;
+  }
+
+  .conteudo {
+    padding: var(--espaco-8) var(--espaco-4);
+  }
+}

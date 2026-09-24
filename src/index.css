@@ -1,4 +1,40 @@
-/* Estilos globais mínimos. Estilo de componente vai em CSS Modules (*.module.css). */
+/* Estilos globais: tokens de cor/espaço, reset e foco visível.
+   Estilo de componente fica em CSS Modules (*.module.css). */
+:root {
+  /* Contraste conferido contra --cor-fundo-cartao (#ffffff), WCAG AA:
+     texto 15,4:1 · suave 7,6:1 · primária 6,5:1 · erro 6,5:1 · sucesso 5,0:1 */
+  --cor-texto: #1f2937;
+  --cor-texto-suave: #4b5563;
+  --cor-primaria: #b91c1c;
+  --cor-primaria-escura: #991b1b;
+  --cor-primaria-clara: #fef2f2;
+  --cor-fundo: #f3f4f6;
+  --cor-fundo-cartao: #ffffff;
+  --cor-borda: #d1d5db;
+  --cor-borda-forte: #6b7280;
+  --cor-erro: #b91c1c;
+  --cor-erro-fundo: #fef2f2;
+  --cor-sucesso: #15803d;
+  --cor-sucesso-fundo: #f0fdf4;
+  --cor-aviso-fundo: #fffbeb;
+  --cor-aviso-borda: #d97706;
+  --cor-foco: #1d4ed8;
+
+  --raio: 8px;
+  --espaco-1: 0.25rem;
+  --espaco-2: 0.5rem;
+  --espaco-3: 0.75rem;
+  --espaco-4: 1rem;
+  --espaco-6: 1.5rem;
+  --espaco-8: 2rem;
+  --largura-max: 72rem;
+
+  color: var(--cor-texto);
+  background: var(--cor-fundo);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+}
+
 *,
 *::before,
 *::after {
@@ -7,11 +43,54 @@
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  line-height: 1.5;
+  min-width: 320px;
+  background: var(--cor-fundo);
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.25;
+  margin: 0 0 var(--espaco-3);
+}
+
+p {
+  margin: 0 0 var(--espaco-3);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--cor-primaria);
 }
 
 :focus-visible {
-  outline: 3px solid #1d4ed8;
+  outline: 3px solid var(--cor-foco);
   outline-offset: 2px;
+}
+
+/* Texto só para leitor de tela. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
 }
