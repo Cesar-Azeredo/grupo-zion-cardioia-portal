@@ -40,7 +40,7 @@ export function Dashboard() {
     <>
       <div className={ui.cabecalhoPagina}>
         <h1>Painel</h1>
-        <p>Olá, {usuario.nome}. Resumo do centro de diagnóstico (dados simulados).</p>
+        <p>Olá, {usuario.nome}. Resumo do centro de diagnóstico (ambiente de simulação).</p>
       </div>
 
       <div className={styles.cartoes}>
