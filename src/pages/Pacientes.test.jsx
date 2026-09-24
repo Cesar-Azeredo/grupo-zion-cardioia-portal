@@ -2,6 +2,7 @@ import { render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { AppointmentsContext } from '../contexts/AppointmentsContext.js'
+import { PatientsProvider } from '../contexts/PatientsProvider.jsx'
 import { Pacientes } from './Pacientes.jsx'
 
 const consulta = { id: 'c1', pacienteId: 1, data: '2026-10-01', hora: '09:00', tipo: 'eletrocardiograma' }
@@ -14,7 +15,9 @@ describe('Pacientes', () => {
     render(
       <AppointmentsContext.Provider value={{ proximaPorPaciente: new Map([[1, consulta]]) }}>
         <MemoryRouter>
-          <Pacientes />
+          <PatientsProvider>
+            <Pacientes />
+          </PatientsProvider>
         </MemoryRouter>
       </AppointmentsContext.Provider>,
     )

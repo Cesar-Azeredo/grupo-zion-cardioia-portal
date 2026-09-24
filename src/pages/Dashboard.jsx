@@ -3,7 +3,7 @@ import { CartaoIndicador } from '../components/CartaoIndicador.jsx'
 import ui from '../components/ui.module.css'
 import { useAppointments } from '../contexts/useAppointments.js'
 import { useAuth } from '../contexts/useAuth.js'
-import { usePacientes } from '../hooks/usePacientes.js'
+import { usePacientes } from '../contexts/usePacientes.js'
 import { useTituloPagina } from '../hooks/useTituloPagina.js'
 import styles from './Dashboard.module.css'
 

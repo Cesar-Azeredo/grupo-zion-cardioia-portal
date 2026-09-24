@@ -3,6 +3,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { AppointmentsContext } from '../contexts/AppointmentsContext.js'
 import { AuthContext } from '../contexts/AuthContext.js'
+import { PatientsProvider } from '../contexts/PatientsProvider.jsx'
 import { distribuicaoPorTipo } from '../contexts/appointmentsReducer.js'
 import { Dashboard } from './Dashboard.jsx'
 
@@ -21,7 +22,9 @@ describe('Dashboard', () => {
       <AuthContext.Provider value={{ usuario: { nome: 'Equipe' } }}>
         <AppointmentsContext.Provider value={{ futuras, doDia: [futuras[0]], porTipo: distribuicaoPorTipo(futuras) }}>
           <MemoryRouter>
-            <Dashboard />
+            <PatientsProvider>
+              <Dashboard />
+            </PatientsProvider>
           </MemoryRouter>
         </AppointmentsContext.Provider>
       </AuthContext.Provider>,

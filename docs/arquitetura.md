@@ -28,10 +28,7 @@ flowchart TD
     subgraph contexts
         AC[AuthContext<br/>useState + useEffect]
         APC[AppointmentsContext<br/>useReducer: agendar, cancelar]
-    end
-
-    subgraph hooks
-        UP[usePacientes<br/>useEffect + AbortController]
+        PC[PatientsContext<br/>uma busca por sessão + AbortController]
     end
 
     subgraph services
@@ -57,8 +54,9 @@ flowchart TD
     PD -->|useContext| APC
     PA -->|useContext + dispatch| APC
 
-    PD & PP & PA --> UP
-    UP --> PS
+    PD & PP & PA -->|usePacientes| PC
+    PP -->|próxima consulta| APC
+    PC --> PS
 
     AC --> AS --> JWT
     AC --> ST
@@ -71,23 +69,26 @@ flowchart TD
 |---|---|---|---|
 | Rotas | `src/App.jsx`, `components/ProtectedRoute` | mapear URL para página; barrar acesso sem login | `useContext`, `useLocation` |
 | Páginas | `src/pages/` | compor a tela; tratar carregando/erro/vazio | `useState` + hooks próprios |
-| Hooks próprios | `src/hooks/` | lógica de React reaproveitada entre páginas (busca de pacientes, título) | `useState`, `useEffect`, `useCallback` |
+| Hooks próprios | `src/hooks/` | lógica de React fora de contexto (título da página) | `useEffect` |
 | Componentes | `src/components/` | UI reutilizável, sem conhecer API | props (`Layout` e `ProtectedRoute` leem `useAuth`) |
-| Contexts | `src/contexts/` | estado global: sessão e consultas | `useState`, `useReducer`, `useEffect` |
+| Contexts | `src/contexts/` | estado global: sessão, pacientes e consultas | `useState`, `useReducer`, `useEffect` |
 | Services | `src/services/` | HTTP, adaptador, JWT fake — funções puras | nenhum |
 
-### Por que consultas vivem num context e pacientes não
+### Por que três contexts
 
-- **Consultas** são criadas no formulário (`Agendamento`) e contadas em outra tela (`Dashboard`). Estado que duas rotas precisam ler precisa estar acima das duas → `AppointmentsContext`.
-- **Pacientes** vêm da API; cada página que precisa usa o hook `usePacientes`, que busca pelo service e **cancela a requisição quando a página sai** (`AbortController`). Não há escrita, então não há estado a compartilhar. Custo aceito: uma requisição por página visitada (a lista tem 10 itens).
+- **Consultas** são criadas no formulário (`Agendamento`) e lidas no `Dashboard` e na lista de `Pacientes`. Estado que várias rotas leem precisa estar acima delas → `AppointmentsContext`.
+- **Pacientes** vêm da API e são lidos por três páginas. Na Etapa 2 cada página fazia sua própria busca (três requisições iguais ao navegar). Desde a Etapa 3 o `PatientsProvider` busca **uma vez por sessão**: ele é montado **em volta das rotas protegidas** (em `App.jsx`, dentro do `ProtectedRoute`), então só busca depois do login, continua montado enquanto se navega entre as páginas, e é desmontado no logout — o próximo login busca de novo. O `AbortController` fica no provider: cancela a requisição no desmonte ou quando `recarregar()` pede outra.
+- **Sessão** (`AuthContext`) envolve tudo, porque o `ProtectedRoute` precisa dela.
 - As **regras** de agendamento moram no reducer (`contexts/appointmentsReducer.js`), não no formulário. `agendar()` roda o próprio reducer (função pura) para saber se a ação é aceita, devolve os erros por campo ao formulário e só então despacha.
 
 ### Adaptador usuário → paciente
 
-`pacientesService` busca `/users` e converte cada usuário num paciente `{ id, nome, codigo, idade, sexo }`:
+`pacientesService` busca `/users` e converte cada usuário num paciente `{ id, nome, codigo, idade }`:
 
 - **Minimização (LGPD, art. 6º, III):** só `id` e `name` são aproveitados; `email`, `phone`, `address` e os demais campos são descartados.
-- **Idade e sexo são simulados**, saídos de uma função **determinística do `id`** (mesmo `id`, mesmo paciente, sem `Math.random`) e sem relação com o nome. A tela os marca como "simulado".
+- **A idade é simulada**, saída de uma função **determinística do `id`** (mesmo `id`, mesmo paciente, sem `Math.random`). A tela a marca como "simulado".
+- **Sexo não entra** (decisão da Etapa 3): nenhuma funcionalidade o usa (princípio da necessidade); inferi-lo pelo nome seria outro viés, e o valor derivado do `id` contradizia o nome.
+- No lugar, a lista mostra um campo **derivado, não inventado**: a próxima consulta agendada do paciente, lida do `AppointmentsContext`, ou "sem consulta agendada".
 - **Nenhum diagnóstico, nível de risco ou rótulo clínico** é gerado: o portal não diagnostica.
 
 ## 2. Fluxo de autenticação

@@ -1,15 +1,18 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { buscarPacientes } from '../services/pacientesService.js'
+import { PatientsContext } from './PatientsContext.js'
 
 /**
- * Busca a lista de pacientes ao montar a página que usa o hook.
- * O AbortController cancela a requisição quando a página sai (ou quando
- * `recarregar` dispara uma nova busca), para não atualizar estado de um
- * componente desmontado nem aplicar uma resposta velha.
+ * Busca a lista de pacientes UMA vez por sessão e a compartilha entre as
+ * páginas. Fica montado em volta das rotas protegidas (App.jsx): navegar
+ * entre Painel, Pacientes e Agendar não refaz a busca; sair (logout) desmonta
+ * o provider e o próximo login busca de novo.
  *
- * @returns {{ pacientes: object[], status: 'carregando'|'sucesso'|'erro', erro: string, recarregar: () => void }}
+ * O AbortController fica aqui: a requisição é cancelada se o provider for
+ * desmontado (logout no meio da carga) ou se `recarregar` pedir outra busca,
+ * e a resposta abortada não mexe em estado.
  */
-export function usePacientes() {
+export function PatientsProvider({ children }) {
   const [pacientes, setPacientes] = useState([])
   const [status, setStatus] = useState('carregando')
   const [erro, setErro] = useState('')
@@ -24,7 +27,7 @@ export function usePacientes() {
         setStatus('sucesso')
       })
       .catch((e) => {
-        if (controlador.signal.aborted) return // página saiu: não mexe em estado
+        if (controlador.signal.aborted) return
         setErro(e instanceof TypeError ? 'Não foi possível conectar ao serviço de pacientes. Verifique a internet.' : e.message)
         setStatus('erro')
       })
@@ -40,5 +43,7 @@ export function usePacientes() {
     setTentativa((n) => n + 1)
   }, [])
 
-  return { pacientes, status, erro, recarregar }
+  const valor = useMemo(() => ({ pacientes, status, erro, recarregar }), [pacientes, status, erro, recarregar])
+
+  return <PatientsContext.Provider value={valor}>{children}</PatientsContext.Provider>
 }

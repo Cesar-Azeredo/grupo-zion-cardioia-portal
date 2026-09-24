@@ -4,7 +4,7 @@ import { Carregando, ErroCarregamento, Vazio } from '../components/EstadoTela.js
 import ui from '../components/ui.module.css'
 import { rotuloDoTipo } from '../contexts/appointmentsReducer.js'
 import { useAppointments } from '../contexts/useAppointments.js'
-import { usePacientes } from '../hooks/usePacientes.js'
+import { usePacientes } from '../contexts/usePacientes.js'
 import { useTituloPagina } from '../hooks/useTituloPagina.js'
 import { formatarData } from '../services/datas.js'
 import { filtrarPorNome } from '../services/pacientesService.js'
