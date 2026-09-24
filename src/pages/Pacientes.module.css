@@ -1,0 +1,76 @@
+.busca {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-1);
+  max-width: 28rem;
+  margin-bottom: var(--espaco-4);
+}
+
+.busca label {
+  font-weight: 600;
+}
+
+.busca input {
+  min-height: 44px;
+  padding: var(--espaco-2) var(--espaco-3);
+  border: 1px solid var(--cor-borda-forte);
+  border-radius: var(--raio);
+  background: var(--cor-fundo-cartao);
+}
+
+.contagem {
+  color: var(--cor-texto-suave);
+}
+
+.lista {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--espaco-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-3);
+}
+
+.nome {
+  font-size: 1.125rem;
+  margin: 0;
+}
+
+.dados {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--espaco-2);
+  margin: 0;
+}
+
+.dados dt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espaco-1);
+  color: var(--cor-texto-suave);
+  font-size: 0.8125rem;
+}
+
+.dados dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+@media (min-width: 40rem) {
+  .lista {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .lista {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
