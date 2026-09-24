@@ -19,7 +19,10 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Imagem fixa, não ubuntu-latest: o GitHub passa o latest para Ubuntu 26 a
+    # partir de 19/10/2026, e o deploy não deve mudar de comportamento sem um
+    # commit. Atualizar a versão aqui é uma decisão explícita.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7.0.1
 
@@ -48,7 +51,7 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # mesmo motivo do job build
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
