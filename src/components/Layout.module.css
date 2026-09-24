@@ -71,7 +71,8 @@
 .nav {
   max-width: var(--largura-max);
   margin: 0 auto;
-  padding: 0 var(--espaco-2);
+  /* Desconta o padding do link para o texto alinhar com a marca e o conteúdo. */
+  padding: 0 calc(var(--espaco-4) - var(--espaco-3));
 }
 
 .nav ul {
