@@ -83,6 +83,15 @@ export function selecionarDoDia(consultas, agora) {
   return consultas.filter((c) => c.data === hoje).sort(porInstante)
 }
 
+/** Map pacienteId → próxima consulta (a lista de futuras já vem ordenada). */
+export function proximaPorPaciente(futuras) {
+  const mapa = new Map()
+  futuras.forEach((c) => {
+    if (!mapa.has(c.pacienteId)) mapa.set(c.pacienteId, c)
+  })
+  return mapa
+}
+
 export function distribuicaoPorTipo(consultas) {
   return TIPOS_CONSULTA.map(({ valor, rotulo }) => ({
     tipo: valor,

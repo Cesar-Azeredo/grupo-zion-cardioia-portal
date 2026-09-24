@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   appointmentsReducer,
   distribuicaoPorTipo,
+  proximaPorPaciente,
   estadoInicial,
   sanitizarConsultasSalvas,
   selecionarDoDia,
@@ -94,6 +95,14 @@ describe('seletores', () => {
 
   it('do dia inclui todas de hoje', () => {
     expect(selecionarDoDia(lista, AGORA).map((c) => c.id)).toEqual(['passada', 'hoje'])
+  })
+
+  it('próxima consulta por paciente é a mais cedo entre as futuras', () => {
+    const futuras = selecionarFuturas([...lista, consulta({ id: 'p2', pacienteId: 2 })], AGORA)
+    const mapa = proximaPorPaciente(futuras)
+    expect(mapa.get(1).id).toBe('hoje')
+    expect(mapa.get(2).id).toBe('p2')
+    expect(mapa.has(3)).toBe(false)
   })
 
   it('distribuição conta por tipo, incluindo zeros', () => {

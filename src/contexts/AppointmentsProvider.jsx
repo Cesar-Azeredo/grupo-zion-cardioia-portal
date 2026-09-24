@@ -5,6 +5,7 @@ import {
   appointmentsReducer,
   distribuicaoPorTipo,
   estadoInicial,
+  proximaPorPaciente,
   sanitizarConsultasSalvas,
   selecionarDoDia,
   selecionarFuturas,
@@ -74,6 +75,7 @@ export function AppointmentsProvider({ children }) {
       futuras,
       doDia: selecionarDoDia(estado.consultas, agora),
       porTipo: distribuicaoPorTipo(futuras),
+      proximaPorPaciente: proximaPorPaciente(futuras),
       agendar,
       cancelar,
     }

@@ -44,7 +44,7 @@
 
 .dados {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--espaco-2);
   margin: 0;
 }
@@ -61,6 +61,22 @@
 .dados dd {
   margin: 0;
   font-weight: 600;
+}
+
+.proxima {
+  grid-column: 1 / -1;
+}
+
+.tipoConsulta {
+  display: block;
+  color: var(--cor-texto-suave);
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+.semConsulta {
+  color: var(--cor-texto-suave);
+  font-weight: 400;
 }
 
 @media (min-width: 40rem) {

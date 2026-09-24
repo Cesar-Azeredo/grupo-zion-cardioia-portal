@@ -22,8 +22,8 @@ describe('adaptarPaciente', () => {
     expect(JSON.stringify(paciente)).not.toMatch(/Sincere|770-736|Kulas|Gwenborough/)
   })
 
-  it('mantém só id e nome da origem, mais campos simulados', () => {
-    expect(Object.keys(adaptarPaciente(USUARIO)).sort()).toEqual(['codigo', 'id', 'idade', 'nome', 'sexo'])
+  it('mantém só id e nome da origem, mais código e idade simulada', () => {
+    expect(Object.keys(adaptarPaciente(USUARIO)).sort()).toEqual(['codigo', 'id', 'idade', 'nome'])
     expect(adaptarPaciente(USUARIO)).toMatchObject({ id: 1, nome: 'Leanne Graham', codigo: 'PAC-0001' })
   })
 
@@ -34,9 +34,9 @@ describe('adaptarPaciente', () => {
     idades.forEach((idade) => expect(idade).toBeLessThanOrEqual(84))
   })
 
-  it('não gera diagnóstico, risco nem rótulo clínico', () => {
+  it('não gera sexo, diagnóstico, risco nem rótulo clínico', () => {
     const chaves = Object.keys(adaptarPaciente(USUARIO)).join(' ')
-    expect(chaves).not.toMatch(/diagn|risco|status|condic|doenc/i)
+    expect(chaves).not.toMatch(/sexo|genero|diagn|risco|status|condic|doenc/i)
   })
 })
 
