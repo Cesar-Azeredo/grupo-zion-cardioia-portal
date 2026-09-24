@@ -165,3 +165,32 @@ flowchart LR
 - O "JWT" é **fake**: a assinatura não é criptográfica e é gerada no próprio navegador. Serve só para simular o formato (header.payload.assinatura) e o controle de expiração.
 - Token em `localStorage` é legível por qualquer script da página, portanto **vulnerável a XSS**. Aplicações reais guardam o token em **cookie `httpOnly`** emitido pelo servidor e validam a assinatura no back-end.
 - A proteção de rotas aqui é só de **interface**: não há dado sensível no servidor para proteger. Tudo é simulação acadêmica.
+
+## 4. Publicação no GitHub Pages e roteamento
+
+O portal é publicado em `https://cesar-azeredo.github.io/grupo-zion-cardioia-portal/` pelo workflow `.github/workflows/pages.yml`, que roda **lint, testes e build** antes de publicar; se qualquer passo falhar, o job de build falha e o deploy não acontece. O `base` do Vite é `/grupo-zion-cardioia-portal/`, em dev e em build.
+
+### O problema
+
+O GitHub Pages é um servidor de arquivos estáticos: não há como configurar uma regra "qualquer caminho → `index.html`". Um link direto para `/grupo-zion-cardioia-portal/pacientes`, ou um recarregar nessa página, pede ao servidor um arquivo `pacientes` que não existe.
+
+### As duas saídas comparadas
+
+| | `HashRouter` | `BrowserRouter` + fallback por `404.html` |
+|---|---|---|
+| Como funciona | a rota vai depois do `#` (`…/#/pacientes`); o navegador não manda o fragmento ao servidor, que sempre entrega o `index.html` | o build copia o `index.html` para `404.html`; o Pages serve esse arquivo para qualquer caminho inexistente e o React Router lê a URL |
+| Código HTTP de um link direto | **200** (o servidor só vê a raiz) | **404** — a página funciona, mas cada link direto e cada recarregar responde "não encontrado" |
+| Recarregar numa rota interna | funciona | funciona (com status 404) |
+| URL | com `#` | limpa |
+| Peças extras | nenhuma: troca `BrowserRouter` por `HashRouter` | passo de build para gerar o `404.html` e um `basename` no router |
+| Efeitos colaterais | nenhum relevante aqui (não há SEO nem renderização no servidor) | monitores, verificadores de link e ferramentas de avaliação veem 404 em links que funcionam; um caminho realmente inexistente também vira a aplicação, em vez de um 404 de verdade |
+
+### Decisão: `HashRouter`
+
+- **Todo link direto responde 200.** Um corretor ou verificador de link que abra `…/#/pacientes` recebe sucesso, e a verificação por HTTP da publicação não fica ambígua.
+- **Sem artifício:** nenhum arquivo gerado a mais e nenhuma dependência de o Pages continuar servindo `404.html` do jeito atual.
+- **O custo — o `#` na URL — não pesa aqui:** o portal não precisa de SEO, está atrás de login e não tem renderização no servidor.
+- O mesmo `HashRouter` roda no `npm run dev`, para o local e o publicado se comportarem igual. Os testes usam `MemoryRouter` e não dependem da escolha.
+- `ProtectedRoute` e o retorno à página de origem não mudam: `location.state.from` funciona igual com hash.
+
+Se um dia o portal sair do Pages para um servidor com reescrita de rotas (Netlify, Vercel, nginx), a troca de volta para `BrowserRouter` é uma linha em `src/main.jsx`.

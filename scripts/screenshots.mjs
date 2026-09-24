@@ -2,7 +2,10 @@
 // Uso: npm run screenshots   (precisa de internet: a lista de pacientes vem
 // do JSONPlaceholder; e do Chromium do Playwright: npx playwright install chromium-headless-shell)
 //
-// Sobe o servidor de desenvolvimento do Vite, entra com as credenciais de
+// Contra a versão publicada:
+//   BASE_URL=https://cesar-azeredo.github.io/grupo-zion-cardioia-portal/ npm run screenshots
+//
+// Sem BASE_URL, sobe o servidor de desenvolvimento do Vite. Entra com as credenciais de
 // demonstração, agenda consultas pelo próprio formulário e fotografa cada
 // página em 390px (celular) e 1280px (desktop). Também confere se alguma
 // página tem rolagem horizontal.
@@ -45,9 +48,16 @@ async function fotografar(pagina, arquivo, rotulo) {
   console.log(`  ✓ docs/screenshots/${arquivo}`)
 }
 
-const servidor = await createServer({ server: { port: 5188, strictPort: true }, logLevel: 'error' })
-await servidor.listen()
-const base = 'http://localhost:5188'
+// Sem BASE_URL, sobe o Vite local (com o mesmo base do vite.config.js).
+let servidor = null
+let base = process.env.BASE_URL
+if (!base) {
+  servidor = await createServer({ server: { port: 5188, strictPort: true }, logLevel: 'error' })
+  await servidor.listen()
+  base = `http://localhost:5188${servidor.config.base}`
+}
+base = base.endsWith('/') ? base : `${base}/`
+console.log(`Alvo: ${base}`)
 const navegador = await chromium.launch({ args: ['--lang=pt-BR'] })
 
 try {
@@ -57,16 +67,16 @@ try {
     const contexto = await navegador.newContext({ viewport: { width, height }, locale: 'pt-BR' })
     const pagina = await contexto.newPage()
 
-    // Rota protegida sem login: tem que cair no /login.
-    await pagina.goto(`${base}/pacientes`)
-    await pagina.waitForURL('**/login')
+    // Link direto para rota protegida sem login: tem que cair no /login.
+    await pagina.goto(`${base}#/pacientes`)
+    await pagina.waitForURL('**#/login')
     await fotografar(pagina, `login-${width}.png`, `login ${width}`)
 
     await pagina.getByLabel('E-mail').fill(CREDENCIAIS_DEMO.email)
     await pagina.getByLabel('Senha').fill(CREDENCIAIS_DEMO.senha)
     await pagina.getByRole('button', { name: 'Entrar' }).click()
     // ...e voltar para a página que se tentou abrir.
-    await pagina.waitForURL('**/pacientes')
+    await pagina.waitForURL('**#/pacientes')
     await pagina.getByText(/pacientes? encontrados?/).waitFor()
     await fotografar(pagina, `pacientes-${width}.png`, `pacientes ${width}`)
 
@@ -97,5 +107,5 @@ try {
   }
 } finally {
   await navegador.close()
-  await servidor.close()
+  await servidor?.close()
 }
