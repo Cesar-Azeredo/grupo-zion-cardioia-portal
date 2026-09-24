@@ -30,11 +30,11 @@ Idioma dos entregáveis e da interface: **português do Brasil**.
 
 | Campo | Valor |
 |---|---|
-| **Etapa em andamento** | **Etapa 1 — fundação** (projeto criado, estrutura, documentação; **nenhuma funcionalidade implementada**) |
-| Etapas concluídas | — |
-| Próxima etapa | Etapa 2 — implementação (a definir pelo humano) |
-| Repositório remoto | **não criado** (aguarda autorização explícita) |
-| Vídeo | **não gravado** |
+| **Etapa em andamento** | **Etapa 2 — funcionalidades** concluída em 2026-09-24, aguardando revisão do humano |
+| Etapas concluídas | Etapa 1 — fundação (2026-09-23); Etapa 2 — autenticação, pacientes, agendamento, painel, testes, capturas, `docs/hooks.md` (2026-09-24) |
+| Próxima etapa | a definir pelo humano |
+| Repositório remoto | **público**: `github.com/Cesar-Azeredo/grupo-zion-cardioia-portal` (criado com `gh` em 2026-09-24, HTTP 200 sem autenticação) |
+| Vídeo | **não gravado** — `TODO(humano)` no README |
 
 > **Mantenha esta tabela atualizada.** É o primeiro lugar que qualquer agente olha.
 
@@ -78,6 +78,18 @@ Idioma dos entregáveis e da interface: **português do Brasil**.
 5. **Estilo:** **CSS Modules** (nativo do Vite), mobile-first, responsivo. Toda tela que busca dado tem estados de **carregando, erro e vazio**. Rótulos em todos os campos e foco visível.
 6. **Nenhum dado pessoal real.** Os nomes do JSONPlaceholder são fictícios. Aviso de simulação acadêmica no **rodapé do portal** e no **README**.
 
+Decisões de implementação da Etapa 2 (2026-09-24):
+
+- **Pasta `src/hooks/`** para hooks próprios que não são de contexto (`usePacientes`, `useTituloPagina`), além das quatro pastas exigidas.
+- **Cada contexto em três arquivos** (`XContext.js`, `XProvider.jsx`, `useX.js`), para o lint `react/only-export-components` passar e o hook de acesso falhar com mensagem clara fora do provider.
+- **Pacientes não ficam num contexto:** cada página usa `usePacientes` (`useEffect` + `AbortController`, cancela ao sair). As contagens de **consultas** do painel vêm dos seletores do `AppointmentsContext`; o total de pacientes vem de `usePacientes`.
+- **Sessão sem estado de "carregando":** o `AuthProvider` valida o token na inicialização preguiçosa do `useState`, antes do primeiro render. Um `useEffect` agenda o logout no instante do `exp`.
+- **Regras de agendamento no reducer puro** (`agora` e `id` chegam na ação). `agendar()` roda o próprio reducer para obter os erros por campo antes de despachar.
+- **Tipos de consulta:** consulta cardiológica, eletrocardiograma, ecocardiograma (os três exemplos do humano).
+- **Credenciais de demonstração:** `demo@cardioia.test` / `cardio123` (domínio `.test`, reservado para testes). Sessão de 1 hora.
+- **Chaves do localStorage:** `cardioia.auth.token.v1` e `cardioia.consultas.v1` (versionadas).
+- **Idade e sexo simulados** saem do `id` (`30 + (id·37 mod 55)` e paridade de `id·7`) e **não têm relação com o nome** — por isso "Leanne Graham" aparece como "Masculino". Decisão consciente: inferir sexo pelo nome seria outro viés; a tela avisa que os campos são simulados.
+
 Fatos verificados que afetam a implementação (2026-09-23):
 
 - `https://jsonplaceholder.typicode.com/users` responde **HTTP 200**, JSON com **10 usuários** e campos `id, name, username, email, address, phone, website, company`. O dashboard vai contar 10 pacientes.
@@ -108,24 +120,30 @@ grupo-zion-cardioia-portal/
 ├── vite.config.js
 ├── .oxlintrc.json         # lint padrão do create-vite (npm run lint)
 ├── docs/
-│   └── arquitetura.md     # diagrama de contexts/services/pages/components e fluxo de auth
+│   ├── arquitetura.md     # diagrama de contexts/services/pages/components e fluxo de auth
+│   ├── hooks.md           # cada hook: onde é usado e por quê
+│   └── screenshots/       # capturas 390px e 1280px (npm run screenshots)
+├── scripts/
+│   └── screenshots.mjs    # Playwright + servidor do Vite
 ├── public/
 │   └── favicon.svg
 └── src/
     ├── main.jsx           # ponto de entrada
-    ├── App.jsx            # placeholder na Etapa 1; rotas na Etapa 2
-    ├── index.css          # só reset e foco visível; o resto é CSS Modules
-    ├── contexts/          # AuthContext, AppointmentsContext
-    ├── components/        # ProtectedRoute, layout, peças de UI (+ *.module.css)
-    ├── services/          # cliente JSONPlaceholder + adaptador; JWT fake
-    └── pages/             # Login, Dashboard, Pacientes, Agendamento
+    ├── App.jsx            # rotas (react-router-dom)
+    ├── index.css          # tokens de cor/espaço, reset e foco visível; o resto é CSS Modules
+    ├── test/setup.js      # jest-dom + limpeza entre testes
+    ├── contexts/          # AuthContext, AppointmentsContext (+ provider, hook, reducer)
+    ├── components/        # ProtectedRoute, Layout, Rodape, Campo, EstadoTela, CartaoIndicador
+    ├── services/          # JSONPlaceholder + adaptador, JWT fake, auth demo, storage, datas
+    ├── pages/             # Login, Dashboard, Pacientes, Agendamento
+    └── hooks/             # usePacientes, useTituloPagina
 ```
 
-Cada pasta de `src/` tem um `README.md` curto explicando o que vai nela.
+Cada pasta de `src/` tem um `README.md` curto explicando o que vai nela. Testes ficam ao lado do código (`*.test.js[x]`).
 
 ---
 
-## 7. Versões registradas (Etapa 1, 2026-09-23)
+## 7. Versões registradas
 
 Consultadas com `npm view <pacote> version` no momento da criação; fixadas **exatas** no `package.json`.
 
@@ -140,6 +158,18 @@ Consultadas com `npm view <pacote> version` no momento da criação; fixadas **e
 | react-router-dom | 7.18.4 |
 | oxlint | 1.85.0 |
 | @types/react / @types/react-dom | 19.3.0 |
+
+Etapa 2 (2026-09-24), também consultadas com `npm view` e fixadas exatas (devDependencies):
+
+| Item | Versão |
+|---|---|
+| vitest | 5.0.1 (exige Node `^22.12.0 \|\| ^24.0.0 \|\| >=26.0.0`) |
+| jsdom | 30.1.1 (exige Node `^22.22.2 \|\| ^24.15.0 \|\| >=26.0.0` — é o que está em `engines`) |
+| @testing-library/react | 16.3.3 |
+| @testing-library/dom | 10.4.2 |
+| @testing-library/jest-dom | 7.0.1 |
+| @testing-library/user-event | 14.6.7 |
+| playwright | 1.63.0 (navegador: Chrome Headless Shell 153.0.8010.12, `npx playwright install chromium-headless-shell`) |
 
 ---
 
