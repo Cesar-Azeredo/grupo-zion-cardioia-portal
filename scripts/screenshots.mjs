@@ -78,7 +78,11 @@ try {
     // ...e voltar para a página que se tentou abrir.
     await pagina.waitForURL('**#/pacientes')
     await pagina.getByText(/pacientes? encontrados?/).waitFor()
-    await fotografar(pagina, `pacientes-${width}.png`, `pacientes ${width}`)
+
+    // Recarregar numa rota interna não pode quebrar (nem deslogar).
+    await pagina.reload()
+    await pagina.getByText(/pacientes? encontrados?/).waitFor()
+    console.log('  ✓ recarregar em #/pacientes mantém a página e a sessão')
 
     await pagina.getByRole('link', { name: 'Agendar', exact: true }).click()
     const paciente = pagina.getByLabel(/^Paciente/)
@@ -102,6 +106,11 @@ try {
     await pagina.getByRole('link', { name: 'Painel' }).click()
     await pagina.getByRole('region', { name: 'Total de pacientes' }).getByText(/^\d+$/).waitFor()
     await fotografar(pagina, `dashboard-${width}.png`, `dashboard ${width}`)
+
+    // Lista de pacientes depois dos agendamentos: mostra a próxima consulta.
+    await pagina.getByRole('link', { name: 'Pacientes' }).click()
+    await pagina.getByText(/pacientes? encontrados?/).waitFor()
+    await fotografar(pagina, `pacientes-${width}.png`, `pacientes ${width}`)
 
     await contexto.close()
   }
